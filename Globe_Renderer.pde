@@ -5,9 +5,9 @@ void setup() {
   sv.printCoords();
   
   for (int i = 0; i < 8; i++) {
-    sv.rotateZ(PI/4);
+    sv.rotateY(PI/4);
     
-    println((i+1)*PI/4);
+    //println((i+1)*PI/4);
     sv.printCoords();
   }
 }
