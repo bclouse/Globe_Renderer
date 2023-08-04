@@ -1,5 +1,4 @@
 final int CARTESIAN = 0;
-;
 final int SPHERICAL = 1;
 
 class SphereVector {
@@ -60,6 +59,13 @@ class SphereVector {
       r = sqrt(x*x + y*y + z*z);
       phi = acos(z/r);
       theta = true_asin(y/(r*sin(phi)), x, y);
+
+      //if (x == 0 && (y >23.5 && y <24)) {
+      //  println("radius: "+r+"\tphi: "+phi+"\n\t"+(y/(r*sin(phi))));
+      //}
+      if (Float.isNaN(theta)) {
+        theta = 0;
+      }
       break;
     case SPHERICAL:
       x = r*sin(phi)*cos(theta);
@@ -117,9 +123,15 @@ class SphereVector {
     }
     updateCoordinates(coord);
   }
-  
-  void setMag(float m) {
+
+  void setMagnitude(float m) {
+    //float magRatio = sqrt((m*m)/(x*x+y*y+z*z));
+    //x *= magRatio;
+    //y *= magRatio;
+    //z *= magRatio;
     r = m;
+
+
     updateCoordinates(SPHERICAL);
   }
 }
@@ -127,7 +139,16 @@ class SphereVector {
 
 
 float true_asin(float v, float x, float y) {
+  if (v > 1) {
+    v = 1;
+  } 
+  if (v < -1 ) {
+    v = -1;
+  }
   float out = asin(v);
+  //if (x == 0 && (y >23.5 && y <24)) {
+  //  println("["+x+","+y+"] \t"+v+" --> "+out);
+  //}
 
   if (x < 0) out = PI-out;
   else if (y < 0) out += TWO_PI;
