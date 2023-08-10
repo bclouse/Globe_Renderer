@@ -3,6 +3,7 @@ final int SPHERICAL = 1;
 
 class SphereVector {
   public float x, y, z, r, theta, phi;    //'radius' is used for cylidrical coordinates. 'r' is used for spherical coordinates.
+  public float value;
 
   SphereVector() {
     init(0, 0, 0, CARTESIAN);
@@ -13,6 +14,7 @@ class SphereVector {
   }
 
   void init(float a, float b, float c, int coordinateMode) {
+    value = 0;
     if (coordinateMode == CARTESIAN) {
       x = a;
       y = b;
@@ -25,7 +27,7 @@ class SphereVector {
       setThetaBounds();
       if (phi > PI/2 || phi < -PI/2) {
         setPhiBounds();
-        println("Phi is out of bounds. Was set to "+(phi/PI)+"*PI");
+        //println("Phi is out of bounds. Was set to "+(phi/PI)+"*PI");
       }
     } else {
       println("ERROR IN 'SphereVector' CONSTRUCTOR. THE 'coordinateMode' ("+coordinateMode+") IS INVALID.\n\tMust be either 0 or 1.");
@@ -34,22 +36,30 @@ class SphereVector {
     updateCoordinates(coordinateMode);
   }
 
+  void setValue(float v) {
+    value = v;
+  }
+
   private void setThetaBounds() {
     while (theta > 2*PI) {
+      //print("Theta was changed from ("+theta+") to (");
       theta -= 2*PI;
+      //println(theta+")");
     }
     while (theta < 0) {
+      //print("Theta was changed from ("+theta+") to (");
       theta += 2*PI;
+      //println(theta+")");
     }
   }
 
 
   private void setPhiBounds() {
-    while (theta > PI/2) {
-      theta -= PI;
+    while (phi > PI) {
+      phi -= PI;
     }
-    while (theta < -PI/2) {
-      theta += PI;
+    while (phi < 0) {
+      phi += PI;
     }
   }
 
@@ -59,13 +69,6 @@ class SphereVector {
       r = sqrt(x*x + y*y + z*z);
       phi = acos(z/r);
       theta = true_asin(y/(r*sin(phi)), x, y);
-
-      //if (x == 0 && (y >23.5 && y <24)) {
-      //  println("radius: "+r+"\tphi: "+phi+"\n\t"+(y/(r*sin(phi))));
-      //}
-      if (Float.isNaN(theta)) {
-        theta = 0;
-      }
       break;
     case SPHERICAL:
       x = r*sin(phi)*cos(theta);
@@ -141,7 +144,7 @@ class SphereVector {
 float true_asin(float v, float x, float y) {
   if (v > 1) {
     v = 1;
-  } 
+  }
   if (v < -1 ) {
     v = -1;
   }
@@ -152,6 +155,9 @@ float true_asin(float v, float x, float y) {
 
   if (x < 0) out = PI-out;
   else if (y < 0) out += TWO_PI;
+  if (Float.isNaN(out)) {
+    out = 0;
+  }
 
   return out;
 }

@@ -26,7 +26,7 @@ class CubeSphere {
         vertices[3][x][y] = new SphereVector(placement[x], placement[y], -size-1, CARTESIAN);
         vertices[4][x][y] = new SphereVector(-size-1, placement[x], placement[y], CARTESIAN);
         vertices[5][x][y] = new SphereVector(placement[x], -size-1, placement[y], CARTESIAN);
-        
+
         //if (x == 5) {
         //  vertices[0][x][y].printCoords();
         //}
@@ -37,7 +37,7 @@ class CubeSphere {
         vertices[3][x][y].setMagnitude(size);
         vertices[4][x][y].setMagnitude(size);
         vertices[5][x][y].setMagnitude(size);
-        
+
         //if (x == 5) {
         //  vertices[0][x][y].printCoords();
         //}
@@ -45,19 +45,36 @@ class CubeSphere {
     }
   }
 
-  void renderShape() {
-    
+  void renderShape(boolean renderImages) {
+
     for (int s = 0; s < 6; s++) {
-      switch(s) {
-        //case 0: fill(255,0,0); break;
-        //case 1: fill(0,255,0); break;
-        //case 2: fill(0,0,255); break;
-        //case 3: fill(255,255,0); break;
-        //case 4: fill(255,0,255); break;
-        //case 5: fill(0,255,255); break;
+      if (!renderImages) {
+        switch(s) {
+        case 0:
+          fill(255, 0, 0);
+          break;
+        case 1:
+          fill(0, 255, 0);
+          break;
+        case 2:
+          fill(0, 0, 255);
+          break;
+        case 3:
+          fill(255, 255, 0);
+          break;
+        case 4:
+          fill(255, 0, 255);
+          break;
+        case 5:
+          fill(0, 255, 255);
+          break;
+        }
       }
       for (int y = 0; y < resolution-1; y++) {
         beginShape(TRIANGLE_STRIP);
+        //if (renderImages) {
+        //  texture(renderStrips[s][x][y]);
+        //}
         for (int x = 0; x < resolution; x++) {
           vertex(vertices[s][x][y].x, vertices[s][x][y].y, vertices[s][x][y].z);
           vertex(vertices[s][x][y+1].x, vertices[s][x][y+1].y, vertices[s][x][y+1].z);
