@@ -79,6 +79,7 @@ class GlobeSphere {
   void renderImage() {
     int xStep = face.width/flatWidth;
     int yStep = face.height/flatHeight;
+    //noStroke();
 
     /*================================
      North Pole

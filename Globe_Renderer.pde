@@ -1,25 +1,27 @@
 PVector angle;
 CubeSphere cs;
 GlobeSphere gs;
-int res = 6;
+int res = 5;
 int axis = 0;
 PImage [][][] renderStrips;
 int globeWidth = 180;
 int globeHeight = 90;
-boolean cubeOrGlobe = false;
+boolean cubeOrGlobe = true;
 PImage flatMap;
 PImage[] cubeMap;
+float angleStep = 0.01;
+int sphereRadius = 200;
 
 void setup() {
-  size(500, 500, P3D);
+  size(1000, 1000, P3D);
   angle = new PVector(0, 0, 0);
   //generateImages();
-  cs = new CubeSphere(150, res);
+  cs = new CubeSphere(sphereRadius, res);
   cubeMap = new PImage[6];
-  cs.loadPictures("Faces\\face_",".png");
-  
-  
-  gs = new GlobeSphere(150, globeWidth, globeHeight);
+  cs.loadPictures("Testing\\face_", ".png");
+
+
+  gs = new GlobeSphere(sphereRadius, globeWidth, globeHeight);
   gs.loadPicture("Faces\\Flat Map.png");
   //sv = new SphereVector(5, 5, 5, CARTESIAN);
   //sv.printCoords();
@@ -40,24 +42,26 @@ void draw() {
   rotateZ(angle.z);
 
   fill(25);
-  stroke(255);
+  stroke(100);
   //noStroke();
 
   if (cubeOrGlobe) {
-    cs.renderShape(false);
+    //cs.renderShape(false);
+    noStroke();
+    cs.renderImages();
   } else {
     noStroke();
     gs.renderImage();
   }
   switch (axis) {
   case 0:
-    angle.x += 0.01;
+    angle.x += angleStep;
     break;
   case 1:
-    angle.y += 0.01;
+    angle.y += angleStep;
     break;
   case 2:
-    angle.z += 0.01;
+    angle.z += angleStep;
     break;
   }
   //exit();
@@ -109,36 +113,40 @@ void keyReleased() {
   case UP:
     if (cubeOrGlobe) {
       res++;
-      cs = new CubeSphere(150, res);
+      cs = new CubeSphere(sphereRadius, res);
     } else {
       globeHeight++;
-      gs = new GlobeSphere(150, globeWidth, globeHeight);
+      gs = new GlobeSphere(sphereRadius, globeWidth, globeHeight);
     }
     break;
   case DOWN:
     if (cubeOrGlobe) {
       res--;
-      cs = new CubeSphere(150, res);
+      cs = new CubeSphere(sphereRadius, res);
     } else {
       globeHeight--;
-      gs = new GlobeSphere(150, globeWidth, globeHeight);
+      gs = new GlobeSphere(sphereRadius, globeWidth, globeHeight);
     }
     break;
   case LEFT:
     if (!cubeOrGlobe) {
       globeWidth--;
-      gs = new GlobeSphere(150, globeWidth, globeHeight);
+      gs = new GlobeSphere(sphereRadius, globeWidth, globeHeight);
     }
     break;
   case RIGHT:
     if (!cubeOrGlobe) {
       globeWidth++;
-      gs = new GlobeSphere(150, globeWidth, globeHeight);
+      gs = new GlobeSphere(sphereRadius, globeWidth, globeHeight);
     }
     break;
   }
   switch(key) {
   case ' ':
     cubeOrGlobe = !cubeOrGlobe;
+    break;
+  case '\n':
+    axis = -1;
+    break;
   }
 }

@@ -22,11 +22,11 @@ class CubeSphere {
 
     for (int y = 0; y < resolution; y++) {
       for (int x = 0; x < resolution; x++) {
-        vertices[0][x][y] = new SphereVector(placement[x], placement[y], size+1, CARTESIAN);
+        vertices[0][x][y] = new SphereVector(placement[resolution-1-x], placement[resolution-1-y], size+1, CARTESIAN);
         vertices[1][x][y] = new SphereVector(size+1, placement[x], placement[y], CARTESIAN);
-        vertices[2][x][y] = new SphereVector(placement[x], size+1, placement[y], CARTESIAN);
-        vertices[3][x][y] = new SphereVector(placement[x], placement[y], -size-1, CARTESIAN);
-        vertices[4][x][y] = new SphereVector(-size-1, placement[x], placement[y], CARTESIAN);
+        vertices[2][x][y] = new SphereVector(placement[resolution-1-x], size+1, placement[y], CARTESIAN);
+        vertices[3][x][y] = new SphereVector(placement[resolution-1-x], placement[y], -size-1, CARTESIAN);
+        vertices[4][x][y] = new SphereVector(-size-1, placement[resolution-1-x], placement[y], CARTESIAN);
         vertices[5][x][y] = new SphereVector(placement[x], -size-1, placement[y], CARTESIAN);
 
         //if (x == 5) {
@@ -47,10 +47,10 @@ class CubeSphere {
     }
   }
 
-  void renderShape(boolean renderImages) {
+  void renderShape(boolean renderColors) {
 
     for (int s = 0; s < 6; s++) {
-      if (!renderImages) {
+      if (renderColors) {
         switch(s) {
         case 0:
           fill(255, 0, 0);
@@ -84,6 +84,30 @@ class CubeSphere {
           //vertex(cube[0][x][y].x, cube[0][x][y].y, cube[0][x][y].z);
           //vertex(cube[0][x][y+1].x, cube[0][x][y+1].y, cube[0][x][y+1].z);
         }
+        endShape();
+      }
+    }
+  }
+
+  void renderImages() {
+    int xStep, yStep;
+    //noStroke();
+
+    for (int s = 0; s < 6; s++) {
+      xStep = faces[s].width/(resolution-1);
+      yStep = faces[s].height/(resolution-1);
+      for (int y = 0; y < resolution-1; y++) {
+        beginShape(TRIANGLE_STRIP);
+        texture(faces[s]);
+        for (int x = 0; x < resolution-1; x++) {
+          vertex(vertices[s][x][y].x, vertices[s][x][y].y, vertices[s][x][y].z, x*xStep, y*yStep);
+          vertex(vertices[s][x][y+1].x, vertices[s][x][y+1].y, vertices[s][x][y+1].z, x*xStep, (y+1)*yStep);
+          //println(cube[0][x][y].x+", "+ cube[0][x][y].y);
+          //vertex(cube[0][x][y].x, cube[0][x][y].y, cube[0][x][y].z);
+          //vertex(cube[0][x][y+1].x, cube[0][x][y+1].y, cube[0][x][y+1].z);
+        }
+          vertex(vertices[s][resolution-1][y].x, vertices[s][resolution-1][y].y, vertices[s][resolution-1][y].z, faces[s].width-1, y*yStep);
+          vertex(vertices[s][resolution-1][y+1].x, vertices[s][resolution-1][y+1].y, vertices[s][resolution-1][y+1].z, faces[s].width-1, (y+1)*yStep);
         endShape();
       }
     }
