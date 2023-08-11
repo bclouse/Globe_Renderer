@@ -106,8 +106,8 @@ class CubeSphere {
           //vertex(cube[0][x][y].x, cube[0][x][y].y, cube[0][x][y].z);
           //vertex(cube[0][x][y+1].x, cube[0][x][y+1].y, cube[0][x][y+1].z);
         }
-          vertex(vertices[s][resolution-1][y].x, vertices[s][resolution-1][y].y, vertices[s][resolution-1][y].z, faces[s].width-1, y*yStep);
-          vertex(vertices[s][resolution-1][y+1].x, vertices[s][resolution-1][y+1].y, vertices[s][resolution-1][y+1].z, faces[s].width-1, (y+1)*yStep);
+        vertex(vertices[s][resolution-1][y].x, vertices[s][resolution-1][y].y, vertices[s][resolution-1][y].z, faces[s].width-1, y*yStep);
+        vertex(vertices[s][resolution-1][y+1].x, vertices[s][resolution-1][y+1].y, vertices[s][resolution-1][y+1].z, faces[s].width-1, (y+1)*yStep);
         endShape();
       }
     }
@@ -118,4 +118,30 @@ class CubeSphere {
       faces[i] = loadImage(fileExtension+i+fileType);
     }
   }
+
+  void updateHeightMap() {
+    int[] indexStep = new int[resolution];
+    for (int i = 0; i < resolution; i++) {
+      indexStep[i] = (int)map(i, 0, resolution, 0, faces[0].width);
+    }
+
+    for (int s = 0; s < 6; s++) {
+      faces[s].loadPixels();
+      for (int y = 0; y < resolution; y++) {
+        for (int x = 0; x < resolution; x++) {
+          //println(x+"\t"+y+"\t"+indexStep[x]+"\t"+face);
+          vertices[s][x][y].value = red(faces[s].pixels[indexStep[x]+indexStep[y]*faces[s].width])*10/255;
+          if (vertices[s][x][y].value < 0.1) {
+            vertices[s][x][y].setMagnitude(-(vertices[s][x][y].r-10));
+          } else {
+            vertices[s][x][y].setMagnitude(-(vertices[s][x][y].value+vertices[s][x][y].r));
+          }
+        }
+      }
+    }
+  }
+}
+
+int coords2PixelArray(int x, int y, int imgW) {
+  return(x+y*imgW);
 }
