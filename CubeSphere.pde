@@ -2,12 +2,14 @@ class CubeSphere {
   float size;
   int resolution;
   SphereVector[][][] vertices;
+  PImage[] faces;
 
   CubeSphere(float s, int r) {
     size = s;
     resolution = r;
     vertices = new SphereVector[6][resolution][resolution];
     getCoords();
+    faces = new PImage[6];
   }
 
   void getCoords() {
@@ -84,6 +86,12 @@ class CubeSphere {
         }
         endShape();
       }
+    }
+  }
+
+  void loadPictures(String fileExtension, String fileType) {
+    for (int i = 0; i < 6; i++) {
+      faces[i] = loadImage(fileExtension+i+fileType);
     }
   }
 }

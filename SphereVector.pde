@@ -2,8 +2,12 @@ final int CARTESIAN = 0;
 final int SPHERICAL = 1;
 
 class SphereVector {
-  public float x, y, z, r, theta, phi;    //'radius' is used for cylidrical coordinates. 'r' is used for spherical coordinates.
+  public float x, y, z, r, theta, phi;
   public float value;
+  
+  /*==========================================================
+                      Initializers
+  ==========================================================*/
 
   SphereVector() {
     init(0, 0, 0, CARTESIAN);
@@ -25,7 +29,7 @@ class SphereVector {
       phi = c;
 
       setThetaBounds();
-      if (phi > PI/2 || phi < -PI/2) {
+      if (phi > PI || phi < 0) {
         setPhiBounds();
         //println("Phi is out of bounds. Was set to "+(phi/PI)+"*PI");
       }
@@ -35,33 +39,10 @@ class SphereVector {
 
     updateCoordinates(coordinateMode);
   }
-
-  void setValue(float v) {
-    value = v;
-  }
-
-  private void setThetaBounds() {
-    while (theta > 2*PI) {
-      //print("Theta was changed from ("+theta+") to (");
-      theta -= 2*PI;
-      //println(theta+")");
-    }
-    while (theta < 0) {
-      //print("Theta was changed from ("+theta+") to (");
-      theta += 2*PI;
-      //println(theta+")");
-    }
-  }
-
-
-  private void setPhiBounds() {
-    while (phi > PI) {
-      phi -= PI;
-    }
-    while (phi < 0) {
-      phi += PI;
-    }
-  }
+  
+  /*==========================================================
+                      Updating Coordinates
+  ==========================================================*/
 
   void updateCoordinates(int coordinateMode) {
     switch (coordinateMode) {
@@ -79,6 +60,10 @@ class SphereVector {
       println("ERROR IN 'updateCoordinates' METHOD. THE 'coordinateMode' ("+coordinateMode+") IS INVALID.\n\tMust be 0 or 1.");
     }
   }
+  
+  /*==========================================================
+                      Rotating Shape
+  ==========================================================*/
 
   void rotateX(float alpha) {
     float radius = sqrt(y*y+z*z);
@@ -105,10 +90,46 @@ class SphereVector {
     setThetaBounds();
     updateCoordinates(SPHERICAL);
   }
+  
+  /*==========================================================
+                      Printing Values
+  ==========================================================*/
 
   void printCoords() {
     println("Cartesian: [ "+x+", "+y+", "+z+" ]");
     println("Spherical: [ "+r+", "+theta+", "+phi+" ]\n");
+  }
+  
+  /*==========================================================
+                      Setting Values
+  ==========================================================*/
+
+  void setValue(float v) {
+    value = v;
+  }
+
+  void setMagnitude(float m) {
+    r = m;
+    updateCoordinates(SPHERICAL);
+  }
+
+  private void setThetaBounds() {
+    while (theta > 2*PI) {
+      theta -= 2*PI;
+    }
+    while (theta < 0) {
+      theta += 2*PI;
+    }
+  }
+
+
+  private void setPhiBounds() {
+    while (phi > PI) {
+      phi -= PI;
+    }
+    while (phi < 0) {
+      phi += PI;
+    }
   }
 
   void setCoords(float a, float b, float c, int coord) {
@@ -125,17 +146,6 @@ class SphereVector {
       break;
     }
     updateCoordinates(coord);
-  }
-
-  void setMagnitude(float m) {
-    //float magRatio = sqrt((m*m)/(x*x+y*y+z*z));
-    //x *= magRatio;
-    //y *= magRatio;
-    //z *= magRatio;
-    r = m;
-
-
-    updateCoordinates(SPHERICAL);
   }
 }
 
