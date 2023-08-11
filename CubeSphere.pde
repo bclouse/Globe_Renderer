@@ -23,11 +23,11 @@ class CubeSphere {
     for (int y = 0; y < resolution; y++) {
       for (int x = 0; x < resolution; x++) {
         vertices[0][x][y] = new SphereVector(placement[resolution-1-x], placement[resolution-1-y], size+1, CARTESIAN);
-        vertices[1][x][y] = new SphereVector(size+1, placement[x], placement[y], CARTESIAN);
-        vertices[2][x][y] = new SphereVector(placement[resolution-1-x], size+1, placement[y], CARTESIAN);
+        vertices[1][x][y] = new SphereVector(placement[resolution-1-x], size+1, placement[y], CARTESIAN);
+        vertices[2][x][y] = new SphereVector(size+1, placement[x], placement[y], CARTESIAN);
         vertices[3][x][y] = new SphereVector(placement[resolution-1-x], placement[y], -size-1, CARTESIAN);
-        vertices[4][x][y] = new SphereVector(-size-1, placement[resolution-1-x], placement[y], CARTESIAN);
-        vertices[5][x][y] = new SphereVector(placement[x], -size-1, placement[y], CARTESIAN);
+        vertices[4][x][y] = new SphereVector(placement[x], -size-1, placement[y], CARTESIAN);
+        vertices[5][x][y] = new SphereVector(-size-1, placement[resolution-1-x], placement[y], CARTESIAN);
 
         //if (x == 5) {
         //  vertices[0][x][y].printCoords();
