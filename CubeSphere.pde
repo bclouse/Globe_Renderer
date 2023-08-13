@@ -1,7 +1,7 @@
 class CubeSphere {
   float size;
   int resolution;
-  SphereVector[][][] vertices;
+  public SphereVector[][][] vertices;
   PImage[] faces;
 
   CubeSphere(float s, int r) {

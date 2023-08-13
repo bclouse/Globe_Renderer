@@ -2,7 +2,7 @@ class GlobeSphere {
   float radius;
   PVector spacing;
   int flatWidth, flatHeight;
-  SphereVector[][] vertices;
+  public SphereVector[][] vertices;
   PImage face;
 
   GlobeSphere(float r, int w, int h) {
