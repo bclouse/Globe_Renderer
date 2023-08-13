@@ -11,6 +11,12 @@ class CubeSphere {
     getCoords();
     faces = new PImage[6];
   }
+  
+  void setResolution(int r) {
+    resolution = r;
+    vertices = new SphereVector[6][resolution][resolution];
+    getCoords();
+  }
 
   void getCoords() {
     float[] placement = new float[resolution];

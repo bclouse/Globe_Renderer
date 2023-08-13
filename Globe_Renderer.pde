@@ -3,17 +3,19 @@ import nervoussystem.obj.*;
 PVector angle;
 CubeSphere cs;
 GlobeSphere gs;
-int res = 500;
-int axis = -3;
+int res = 50;
+int axis = 0;
 PImage [][][] renderStrips;
-int globeWidth = 180;
-int globeHeight = 90;
-boolean cubeOrGlobe = true;
+int globeWidth = 1800;
+int globeHeight = 900;
 PImage flatMap;
 PImage[] cubeMap;
 float angleStep = 0.01;
 int sphereRadius = 200;
+boolean cubeOrGlobe = false;
+boolean renderImages = true;
 boolean saveOBJ = true;
+float HEIGHT_MAP_RATIO = 10.0/255;
 
 void setup() {
   size(1000, 1000, P3D);
@@ -21,11 +23,28 @@ void setup() {
   cs = new CubeSphere(sphereRadius, res);
   cubeMap = new PImage[6];
   cs.loadPictures("Faces\\face_", ".png");
-  cs.updateHeightMap();
+
+  if (saveOBJ) {
+    cs.updateHeightMap();
+  } else {
+    res = 50;
+    cs.setResolution(res);
+  }
 
 
   gs = new GlobeSphere(sphereRadius, globeWidth, globeHeight);
   gs.loadPicture("Faces\\Flat Map.png");
+  gs.rotateGlobe(2, -PI/4);
+
+
+  if (saveOBJ) {
+    gs.updateHeightMap();
+  } else {
+    globeWidth = 90;
+    globeHeight = 45;
+    gs.setSize(globeWidth, globeHeight);
+    gs.rotateGlobe(2, -PI/4);
+  }
 }
 
 void draw() {
@@ -40,17 +59,24 @@ void draw() {
     fill(0);
     stroke(100);
   } else {
-    beginRecord("nervoussystem.obj.OBJExport", "test.obj");
+    beginRecord("nervoussystem.obj.OBJExport", "globe.obj");
   }
   //noStroke();
 
   if (cubeOrGlobe) {
-    cs.renderShape(false);
-    //noStroke();
-    //cs.renderImages();
+    if (renderImages && !saveOBJ) {
+      noStroke();
+      cs.renderImages();
+    } else {
+      cs.renderShape(false);
+    }
   } else {
-    noStroke();
-    gs.renderImage();
+    if (renderImages && !saveOBJ) {
+      noStroke();
+      gs.renderImage();
+    } else {
+      gs.renderShape();
+    }
   }
   switch (axis) {
   case 0:
@@ -63,12 +89,19 @@ void draw() {
     angle.z += angleStep;
     break;
   }
-  
+
   if (saveOBJ) {
     endRecord();
     saveOBJ = false;
+    //if (cubeOrGlobe) {
     res = 50;
-      cs = new CubeSphere(sphereRadius, res);
+    cs.setResolution(res);
+    //} else {
+    globeWidth = 90;
+    globeHeight = 45;
+    gs.setSize(globeWidth, globeHeight);
+    gs.rotateGlobe(2, -PI/4);
+    //}
   }
   //exit();
 }
@@ -86,31 +119,35 @@ void keyReleased() {
   case UP:
     if (cubeOrGlobe) {
       res++;
-      cs = new CubeSphere(sphereRadius, res);
+      cs.setResolution(res);
     } else {
       globeHeight++;
       gs = new GlobeSphere(sphereRadius, globeWidth, globeHeight);
+      gs.rotateGlobe(2, -PI/4);
     }
     break;
   case DOWN:
     if (cubeOrGlobe) {
       res--;
-      cs = new CubeSphere(sphereRadius, res);
+      cs.setResolution(res);
     } else {
       globeHeight--;
       gs = new GlobeSphere(sphereRadius, globeWidth, globeHeight);
+      gs.rotateGlobe(2, -PI/4);
     }
     break;
   case LEFT:
     if (!cubeOrGlobe) {
       globeWidth--;
       gs = new GlobeSphere(sphereRadius, globeWidth, globeHeight);
+      gs.rotateGlobe(2, -PI/4);
     }
     break;
   case RIGHT:
     if (!cubeOrGlobe) {
       globeWidth++;
       gs = new GlobeSphere(sphereRadius, globeWidth, globeHeight);
+      gs.rotateGlobe(2, -PI/4);
     }
     break;
   }

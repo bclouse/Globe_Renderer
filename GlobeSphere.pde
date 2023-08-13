@@ -76,6 +76,24 @@ class GlobeSphere {
     face = loadImage(fileName);
   }
 
+  void rotateGlobe(int rotateAxis, float rotateAngle) {
+    for (int y = 0; y < flatHeight; y++) {
+      for (int x = 0; x < flatWidth; x++) {
+        switch (rotateAxis) {
+        case 0:
+          vertices[x][y].rotateX(rotateAngle);
+          break;
+        case 1:
+          vertices[x][y].rotateY(rotateAngle);
+          break;
+        case 2:
+          vertices[x][y].rotateZ(rotateAngle);
+          break;
+        }
+      }
+    }
+  }
+
   void renderImage() {
     int xStep = face.width/flatWidth;
     int yStep = face.height/flatHeight;
@@ -126,5 +144,31 @@ class GlobeSphere {
     vertex(vertices[0][flatHeight-2].x, vertices[0][flatHeight-2].y, vertices[0][flatHeight-2].z, 0, (flatHeight-2)*yStep);
     vertex(vertices[0][flatHeight-1].x, vertices[0][flatHeight-1].y, vertices[0][flatHeight-1].z, 0, face.height-1);
     endShape();
+  }
+
+  void updateHeightMap() {
+    int[] xStep = new int[flatWidth];
+    int[] yStep = new int[flatHeight];
+    for (int i = 0; i < flatWidth; i++) {
+      xStep[i] = (int)map(i, 0, flatWidth, 0, face.width);
+    }
+    for (int i = 0; i < flatHeight; i++) {
+      yStep[i] = (int)map(i, 0, flatHeight, 0, face.height);
+    }
+    face.loadPixels();
+    for (int y = 0; y < flatHeight; y++) {
+      for (int x = 0; x < flatWidth; x++) {
+        vertices[x][y].value = HEIGHT_MAP_RATIO*red(face.pixels[xStep[x]+yStep[y]*face.width]);
+        vertices[x][y].setMagnitude(vertices[x][y].value + vertices[x][y].r);
+      }
+    }
+  }
+  
+  void setSize(int w, int h) {
+    flatWidth = w;
+    flatHeight = h;
+    spacing = new PVector(2*PI/w, PI/(h-1));
+    vertices = new SphereVector[w][h];
+    getCoords();
   }
 }
