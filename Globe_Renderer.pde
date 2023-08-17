@@ -1,6 +1,7 @@
 import nervoussystem.obj.*;
 
 PVector angle;
+Converter convert;
 CubeSphere cube;
 GlobeSphere globe;
 int res = 500;
@@ -23,7 +24,7 @@ float offset = 99999;
 
 void setup() {
   size(1000, 1000, P3D);
-  angle = new PVector(0, -PI/2, PI/4);
+  angle = new PVector(0, 0, 0);
   cube = new CubeSphere(sphereRadius, res);
   cubeMap = new PImage[6];
   cube.loadPictures("Faces\\face_", ".png");
@@ -39,7 +40,7 @@ void setup() {
 
   globe = new GlobeSphere(sphereRadius, globeWidth, globeHeight);
   globe.loadPicture("Faces\\Flat Map.png");
-  globe.rotateGlobe(2, -PI/4);
+  //globe.rotateGlobe(2, -PI/4);
 
 
   //if (saveOBJ) {
@@ -53,12 +54,13 @@ void setup() {
   //CubeSphere cubesphere = new CubeSphere(sphereRadius, 10);
   //GlobeSphere globesphere = new GlobeSphere(sphereRadius, 18, 9);
 
-  Converter convert = new Converter(cube, globe);
+  convert = new Converter(cube, globe);
   noiseSeed(1);
   noiseDetail(13, 0.5);
-  updateGlobe();
+  //updateGlobe();
   convert.convert();
   
+  getImages();
 }
 
 void draw() {
@@ -133,10 +135,10 @@ void draw() {
 
 void updateGlobe() {
   float scale = sampleRadius/sphereRadius;
-  flatMap = createImage(globeWidth, globeHeight, RGB);
+  //flatMap = createImage(globeWidth, globeHeight, RGB);
   //int index = 0;
 
-  loadPixels2D(flatMap);
+  //loadPixels2D(flatMap);
   for (int y = 0; y < globe.flatHeight; y++) {
     for (int x = 0; x < globe.flatWidth; x++) {
       globe.vertices[x][y].value = maxLevel*noise(globe.vertices[x][y].x*scale+offset, globe.vertices[x][y].y*scale+offset, globe.vertices[x][y].z*scale+offset);
@@ -146,11 +148,55 @@ void updateGlobe() {
         globe.vertices[x][y].value = 0;
         globe.vertices[x][y].setMagnitude(sphereRadius);
       }
-      pixels2D[x][y] = color(globe.vertices[x][y].value * 10);
+      //pixels2D[globe.flatWidth-x-1][y] = color(globe.vertices[x][y].value * 10);
+    }
+  }
+  //updatePixels2D(flatMap);
+  //flatMap.save("Testing\\test.png");
+}
+
+void getImages() {
+  flatMap = createImage(globeWidth, globeHeight, RGB);
+  //int index = 0;
+
+  loadPixels2D(flatMap);
+  for (int y = 0; y < globe.flatHeight; y++) {
+    for (int x = 0; x < globe.flatWidth; x++) {
+      pixels2D[globe.flatWidth-x-1][y] = color(globe.vertices[x][y].value);
     }
   }
   updatePixels2D(flatMap);
   flatMap.save("Testing\\test.png");
+  
+  
+
+    PGraphics full = createGraphics(4*res, 3*res);
+    full.beginDraw();
+    full.background(25);
+    full.image(cubeMap[1], 0*res, 1*res);
+    full.image(cubeMap[2], 1*res, 1*res);
+    full.image(cubeMap[4], 2*res, 1*res);
+    full.image(cubeMap[5], 3*res, 1*res);
+    
+    full.image(cubeMap[0], 0*res, 0*res);
+    full.image(cubeMap[3], 0*res, 2*res);
+    full.save("Testing\\full.png");
+    full.image(rotateImage(cubeMap[0],1), 1*res, 0*res);
+    full.image(rotateImage(cubeMap[0],2), 2*res, 0*res);
+    full.image(rotateImage(cubeMap[0],3), 3*res, 0*res);
+    full.image(rotateImage(cubeMap[3],3), 1*res, 2*res);
+    full.image(rotateImage(cubeMap[3],2), 2*res, 2*res);
+    full.image(rotateImage(cubeMap[3],1), 3*res, 2*res);
+    full.save("Testing\\full_rotated.png");
+    
+    full.fill(25);
+    full.noStroke();
+    for (int i = 0; i < 5; i++) {
+      full.triangle((i-1)*res,0,(i+1)*res,0,i*res,res);
+      full.triangle((i-1)*res,3*res,(i+1)*res,3*res,i*res,2*res);
+    }
+    full.endDraw();
+    full.save("Testing\\full_triangle.png");
 }
 
 void mouseReleased() {

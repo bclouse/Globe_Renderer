@@ -27,26 +27,12 @@ class Converter {
       loadPixels2D(cubeMap[s]);
       for (int y = 0; y < cRes; y++) {
         for (int x = 0; x < cRes; x++) {
-          pixels2D[x][y] = color(cs.vertices[s][x][y].value*10);
+          pixels2D[x][y] = color(cs.vertices[s][x][y].value);
         }
       }
       updatePixels2D(cubeMap[s]);
       cubeMap[s].save(("Testing\\face_"+s+".png"));
     }
-
-
-
-    PGraphics full = createGraphics(4*cRes, 3*cRes);
-    full.beginDraw();
-    full.background(25);
-    full.image(cubeMap[0], 0*cRes, 0*cRes);
-    full.image(cubeMap[1], 0*cRes, 1*cRes);
-    full.image(cubeMap[2], 1*cRes, 1*cRes);
-    full.image(cubeMap[3], 0*cRes, 2*cRes);
-    full.image(cubeMap[4], 2*cRes, 1*cRes);
-    full.image(cubeMap[5], 3*cRes, 1*cRes);
-    full.endDraw();
-    full.save("Testing\\full.png");
   }
 
   void getGlobeCoords() {

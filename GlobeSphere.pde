@@ -74,6 +74,13 @@ class GlobeSphere {
 
   void loadPicture(String fileName) {
     face = loadImage(fileName);
+    loadPixels2D(face);
+    
+    for (int y = 0; y < face.height; y++) {
+      for (int x = 0; x < face.width; x++) {
+        vertices[face.width-x-1][y].value = red(pixels2D[x][y]);
+      }
+    }
   }
 
   void rotateGlobe(int rotateAxis, float rotateAngle) {
