@@ -13,18 +13,33 @@ void loadPixels2D(PImage img) {
   }
 }
 
-color[] updatePixels2D() {
-  color[] out = new int[pixels2D.length*pixels2D[0].length];
+//color[] updatePixels2D() {
+//  color[] out = new int[pixels2D.length*pixels2D[0].length];
+//  int index = 0;
+  
+//  for (int y = 0; y < pixels2D[0].length; y++) {
+//    for (int x = 0; x < pixels2D.length; x++) {
+//      out[index] = pixels2D[x][y];
+//      index++;
+//    }
+//  }
+  
+//  return out;
+//}
+
+void updatePixels2D(PImage img) {
   int index = 0;
+  
+  img.loadPixels();
   
   for (int y = 0; y < pixels2D[0].length; y++) {
     for (int x = 0; x < pixels2D.length; x++) {
-      out[index] = pixels2D[x][y];
+      img.pixels[index] = pixels2D[x][y];
       index++;
     }
   }
   
-  return out;
+  img.updatePixels();
 }
 
 PImage rotateImage(PImage img, int rotationID) {

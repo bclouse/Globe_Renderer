@@ -3,8 +3,8 @@ import nervoussystem.obj.*;
 PVector angle;
 CubeSphere cube;
 GlobeSphere globe;
-int res = 50;
-int axis = 0;
+int res = 500;
+int axis = -3;
 PImage [][][] renderStrips;
 int globeWidth = 1800;
 int globeHeight = 900;
@@ -13,23 +13,28 @@ PImage[] cubeMap;
 float angleStep = 0.01;
 int sphereRadius = 200;
 boolean cubeOrGlobe = false;
-boolean renderImages = true;
-boolean saveOBJ = true;
+boolean renderImages = false;
+boolean saveOBJ = false;
 float HEIGHT_MAP_RATIO = 10.0/255;
+float sampleRadius = 1;
+float maxLevel = 25;
+float waterLevel = 13;
+float offset = 99999;
 
 void setup() {
   size(1000, 1000, P3D);
-  angle = new PVector(0, 0, 0);
+  angle = new PVector(0, -PI/2, PI/4);
   cube = new CubeSphere(sphereRadius, res);
   cubeMap = new PImage[6];
   cube.loadPictures("Faces\\face_", ".png");
+  cubeMap = new PImage[6];
 
-  if (saveOBJ) {
-    cube.updateHeightMap();
-  } else {
-    res = 50;
-    cube.setResolution(res);
-  }
+  //if (saveOBJ) {
+  //  cube.updateHeightMap();
+  //} else {
+  //  res = 50;
+  //  cube.setResolution(res);
+  //}
 
 
   globe = new GlobeSphere(sphereRadius, globeWidth, globeHeight);
@@ -37,31 +42,46 @@ void setup() {
   globe.rotateGlobe(2, -PI/4);
 
 
-  if (saveOBJ) {
-    globe.updateHeightMap();
-  } else {
-    globeWidth = 90;
-    globeHeight = 45;
-    globe.setSize(globeWidth, globeHeight);
-    globe.rotateGlobe(2, -PI/4);
-  }
+  //if (saveOBJ) {
+  //globe.updateHeightMap();
+  //} else {
+  //  globeWidth = 90;
+  //  globeHeight = 45;
+  //  globe.setSize(globeWidth, globeHeight);
+  //  globe.rotateGlobe(2, -PI/4);
+  //}
+  //CubeSphere cubesphere = new CubeSphere(sphereRadius, 10);
+  //GlobeSphere globesphere = new GlobeSphere(sphereRadius, 18, 9);
+
+  Converter convert = new Converter(cube, globe);
+  noiseSeed(1);
+  noiseDetail(13, 0.5);
+  updateGlobe();
+  convert.convert();
+  
 }
 
 void draw() {
+  //exit();
   background(25);
 
-  if (!saveOBJ) {
-    translate(width/2, height/2);
-    rotateX(angle.x);
-    rotateY(angle.y);
-    rotateZ(angle.z);
-
-    fill(0);
-    stroke(100);
+  //if (!saveOBJ) {
+  translate(width/2, height/2);
+  rotateX(angle.x);
+  rotateY(angle.y);
+  if (cubeOrGlobe) {
+    rotateZ(-PI/4 + angle.z);
   } else {
-    beginRecord("nervoussystem.obj.OBJExport", "globe.obj");
+    rotateZ(angle.z);
   }
-  //noStroke();
+
+  fill(0);
+  noStroke();
+  //stroke(100);
+  //} else {
+  //  beginRecord("nervoussystem.obj.OBJExport", "globe.obj");
+  //}
+  ////noStroke();
 
   if (cubeOrGlobe) {
     if (renderImages && !saveOBJ) {
@@ -78,6 +98,11 @@ void draw() {
       globe.renderShape();
     }
   }
+
+  noStroke();
+  fill(0, 0, 200);
+  sphere(sphereRadius+waterLevel);
+
   switch (axis) {
   case 0:
     angle.x += angleStep;
@@ -90,20 +115,42 @@ void draw() {
     break;
   }
 
-  if (saveOBJ) {
-    endRecord();
-    saveOBJ = false;
-    //if (cubeOrGlobe) {
-    res = 50;
-    cube.setResolution(res);
-    //} else {
-    globeWidth = 90;
-    globeHeight = 45;
-    globe.setSize(globeWidth, globeHeight);
-    globe.rotateGlobe(2, -PI/4);
-    //}
+  //if (saveOBJ) {
+  //  endRecord();
+  //  saveOBJ = false;
+  //  //if (cubeOrGlobe) {
+  //  res = 50;
+  //  cube.setResolution(res);
+  //  //} else {
+  //  globeWidth = 90;
+  //  globeHeight = 45;
+  //  globe.setSize(globeWidth, globeHeight);
+  //  globe.rotateGlobe(2, -PI/4);
+  //  //}
+  //}
+  exit();
+}
+
+void updateGlobe() {
+  float scale = sampleRadius/sphereRadius;
+  flatMap = createImage(globeWidth, globeHeight, RGB);
+  //int index = 0;
+
+  loadPixels2D(flatMap);
+  for (int y = 0; y < globe.flatHeight; y++) {
+    for (int x = 0; x < globe.flatWidth; x++) {
+      globe.vertices[x][y].value = maxLevel*noise(globe.vertices[x][y].x*scale+offset, globe.vertices[x][y].y*scale+offset, globe.vertices[x][y].z*scale+offset);
+      if (globe.vertices[x][y].value >= waterLevel-2) {
+        globe.vertices[x][y].setMagnitude(sphereRadius + globe.vertices[x][y].value);
+      } else {
+        globe.vertices[x][y].value = 0;
+        globe.vertices[x][y].setMagnitude(sphereRadius);
+      }
+      pixels2D[x][y] = color(globe.vertices[x][y].value * 10);
+    }
   }
-  //exit();
+  updatePixels2D(flatMap);
+  flatMap.save("Testing\\test.png");
 }
 
 void mouseReleased() {
@@ -161,6 +208,24 @@ void keyReleased() {
     } else {
       axis += 3;
     }
+    break;
+  case 'w':
+    waterLevel++;
+    println("Water Level: "+waterLevel);
+    break;
+  case 's':
+    waterLevel--;
+    println("Water Level: "+waterLevel);
+    break;
+  case 'a':
+    sampleRadius -= 0.25;
+    updateGlobe();
+    println("Sample Radius: "+sampleRadius);
+    break;
+  case 'd':
+    sampleRadius += 0.25;
+    updateGlobe();
+    println("Sample Radius: "+sampleRadius);
     break;
   }
 }
