@@ -4,10 +4,10 @@ final int SPHERICAL = 1;
 class SphereVector {
   public float x, y, z, r, theta, phi;
   public float value;
-  
+
   /*==========================================================
-                      Initializers
-  ==========================================================*/
+   Initializers
+   ==========================================================*/
 
   SphereVector() {
     init(0, 0, 0, CARTESIAN);
@@ -39,10 +39,10 @@ class SphereVector {
 
     updateCoordinates(coordinateMode);
   }
-  
+
   /*==========================================================
-                      Updating Coordinates
-  ==========================================================*/
+   Updating Coordinates
+   ==========================================================*/
 
   void updateCoordinates(int coordinateMode) {
     switch (coordinateMode) {
@@ -60,10 +60,10 @@ class SphereVector {
       println("ERROR IN 'updateCoordinates' METHOD. THE 'coordinateMode' ("+coordinateMode+") IS INVALID.\n\tMust be 0 or 1.");
     }
   }
-  
+
   /*==========================================================
-                      Rotating Shape
-  ==========================================================*/
+   Rotating Shape
+   ==========================================================*/
 
   void rotateX(float alpha) {
     float radius = sqrt(y*y+z*z);
@@ -90,19 +90,19 @@ class SphereVector {
     setThetaBounds();
     updateCoordinates(SPHERICAL);
   }
-  
+
   /*==========================================================
-                      Printing Values
-  ==========================================================*/
+   Printing Values
+   ==========================================================*/
 
   void printCoords() {
     println("Cartesian: [ "+x+", "+y+", "+z+" ]");
     println("Spherical: [ "+r+", "+theta+", "+phi+" ]\n");
   }
-  
+
   /*==========================================================
-                      Setting Values
-  ==========================================================*/
+   Setting Values
+   ==========================================================*/
 
   void setValue(float v) {
     value = v;
@@ -110,6 +110,11 @@ class SphereVector {
 
   void setMagnitude(float m) {
     r = m;
+    updateCoordinates(SPHERICAL);
+  }
+
+  void setMagnitude(float m, float ratio) {
+    r = m + value*ratio;
     updateCoordinates(SPHERICAL);
   }
 
@@ -149,7 +154,11 @@ class SphereVector {
   }
 }
 
-
+/*==========================================================
+ **true_asin**
+ Determines the angle of the arcsin with the full range of
+ angles from 0 to 2PI.
+ ==========================================================*/
 
 float true_asin(float v, float x, float y) {
   if (v > 1) {
@@ -159,9 +168,6 @@ float true_asin(float v, float x, float y) {
     v = -1;
   }
   float out = asin(v);
-  //if (x == 0 && (y >23.5 && y <24)) {
-  //  println("["+x+","+y+"] \t"+v+" --> "+out);
-  //}
 
   if (x < 0) out = PI-out;
   else if (y < 0) out += TWO_PI;

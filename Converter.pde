@@ -7,6 +7,10 @@ class Converter {
   float phiSpacing;
   int cRes;
 
+  /*==========================================================
+                           Initializers
+   ==========================================================*/
+
   Converter(CubeSphere c, GlobeSphere g) {
     cs = c;
     gs = g;
@@ -15,11 +19,24 @@ class Converter {
     cRes = cs.resolution;
   }
 
-  void convert() {
-    getGlobeCoords();
-    getCubeCoords();
+  /*==========================================================
+                           Converters
+   ==========================================================*/
+
+  void convertGlobe2Cube() {
+    getGlobeCoords(false);
+    getCubeCoords(true);
     cube2Image();
   }
+
+  void convertCube2Globe() {
+    getCubeCoords(false);
+    getGlobeCoords(true);
+  }
+
+  /*==========================================================
+                        Image Saving
+   ==========================================================*/
 
   void cube2Image() {
     for (int s = 0; s < 6; s++) {
@@ -35,42 +52,50 @@ class Converter {
     }
   }
 
-  void getGlobeCoords() {
+  /*==========================================================
+                        Getting Coords
+   ==========================================================*/
+
+  void getGlobeCoords(boolean updateValues) {
     globe2D = new PVector[gs.flatWidth][gs.flatHeight];
 
     for (int i = 0; i < gs.flatWidth; i++) {
       for (int j = 0; j < gs.flatHeight; j++) {
-        globe2D[i][j] = new PVector(i, j);
+        if (updateValues) {
+          //convert from Cube to Globe
+        } else {
+          globe2D[i][j] = new PVector(i, j, gs.vertices[i][j].value);
+        }
       }
     }
   }
 
-  void getCubeCoords() {
+  void getCubeCoords(boolean updateValue) {
     cube2D = new PVector[6][cRes][cRes];
     float xCoord, yCoord, newVal;
 
     for (int s = 0; s < 6; s++) {
       for (int y = 0; y < cRes; y++) {
         for (int x = 0; x < cRes; x++) {
-          //if (x == 5 && y == 5) {
-          //  println("\n\nSide: "+s+"\t\t[ "+x+", "+y+" ]");
-          //  cs.vertices[s][x][y].printCoords();
-          //}
           xCoord = cs.vertices[s][x][y].theta/thetaSpacing;
           yCoord = cs.vertices[s][x][y].phi/phiSpacing;
-          newVal = dualInterpolate(getVectors(xCoord, yCoord), getValues((int)xCoord, (int)yCoord, gs));
+          if (updateValue) {
+            newVal = dualInterpolate(getVectors(xCoord, yCoord), getValues((int)xCoord, (int)yCoord, gs));
+            cs.vertices[s][x][y].value = newVal;
+            cs.vertices[s][x][y].setMagnitude(sphereRadius+newVal);
+          } else {
+            newVal = cs.vertices[s][x][y].value;
+          }
           cube2D[s][x][y] = new PVector(xCoord, yCoord, newVal);
-          cs.vertices[s][x][y].value = newVal;
-          cs.vertices[s][x][y].setMagnitude(sphereRadius+newVal);
-          //if (x == 5 && y == 5) {
-          //  println("xCoord: "+xCoord+"\tyCoord: "+yCoord+"\tnewVal: "+newVal);
-          //  cs.vertices[s][x][y].printCoords();
-          //}
         }
       }
     }
   }
 }
+
+/*===================================================================
+            Interpolation for globe to Cube Conversion
+===================================================================*/
 
 PVector[] getVectors(float posX, float posY) {  //gets the array of PVectors needed for the "dualInterpolate" function
   int a = (int) posX;                      //gets the x location in the upper left of the map coordinate
@@ -99,7 +124,6 @@ float[] getValues(int x, int y, GlobeSphere globe) {
   } else {
     y2 = y+1;
   }
-
 
   out[0] = globe.vertices[x][y].value;
   out[1] = globe.vertices[x2][y].value;
@@ -130,11 +154,29 @@ float dualInterpolate(PVector[] positions, float [] v) {  //positions: [0] low, 
   return map(positions[2].y, positions[0].y, positions[1].y, top, bottom);
 }
 
-//float dualInterpolate(float x1, float x2, float y1, float y2, float posX, float posY, float v1, float v2, float v3, float v4) {
-//  float top, bottom;
+/*===================================================================
+          Triangle Interpolation for Cube to Globe Conversion
+===================================================================*/
 
-//  top = map(posX, x1, x2, v1, v2);
-//  bottom = map(posX, x1, x2, v3, v4);
+boolean isInsideTriangle(PVector p1, PVector p2, PVector p3, float x, float y) {
+  float a, b, c;
+  a = (p2.x-p1.x)*(y-p1.y)-(p2.y-p1.y)*(x-p1.x);
+  b = (p3.x-p2.x)*(y-p2.y)-(p3.y-p2.y)*(x-p2.x);
+  c = (p1.x-p3.x)*(y-p3.y)-(p1.y-p3.y)*(x-p3.x);
+  ;
+  if ((a <= 0 && b <= 0 && c <= 0)||(a >= 0 && b >= 0 && c >= 0)) {
+    return true;
+  }
+  return false;
+}
 
-//  return map(posY, y1, y2, top, bottom);
-//}
+
+
+float triangleInterp(PVector p1, PVector p2, PVector p3, float x, float y) {
+  float a = (p2.y-p1.y)*(p3.z-p1.z)-(p2.z-p1.z)*(p3.y-p1.y);
+  float b = (p2.z-p1.z)*(p3.x-p1.x)-(p2.x-p1.x)*(p3.z-p1.z);
+  float c = (p2.x-p1.x)*(p3.y-p1.y)-(p2.y-p1.y)*(p3.x-p1.x);
+  float v = p1.x*a + p1.y*b + p1.z*c;
+
+  return (v-a*x-b*y)/c;
+}

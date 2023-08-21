@@ -1,4 +1,9 @@
 color[][] pixels2D;
+  
+/*==========================================================
+   Initializes the 'pixels2D' array by using the given
+           image to load the color values.
+==========================================================*/
 
 void loadPixels2D(PImage img) {
   int index = 0;
@@ -12,20 +17,11 @@ void loadPixels2D(PImage img) {
     }
   }
 }
-
-//color[] updatePixels2D() {
-//  color[] out = new int[pixels2D.length*pixels2D[0].length];
-//  int index = 0;
   
-//  for (int y = 0; y < pixels2D[0].length; y++) {
-//    for (int x = 0; x < pixels2D.length; x++) {
-//      out[index] = pixels2D[x][y];
-//      index++;
-//    }
-//  }
-  
-//  return out;
-//}
+/*==========================================================
+         Transfers the contents of 'pixels2D' 
+               to the given PImage
+==========================================================*/
 
 void updatePixels2D(PImage img) {
   int index = 0;
@@ -41,6 +37,11 @@ void updatePixels2D(PImage img) {
   
   img.updatePixels();
 }
+  
+/*==========================================================
+    Creates a new PImage that is rotated 90, 180, or 270
+  degrees as noted by a rotationID 1, 2, or 3 respectively
+==========================================================*/
 
 PImage rotateImage(PImage img, int rotationID) {
   color[][] dummy;

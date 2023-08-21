@@ -39,7 +39,7 @@ void setup() {
 
 
   globe = new GlobeSphere(sphereRadius, globeWidth, globeHeight);
-  globe.loadPicture("Faces\\Flat Map.png");
+  globe.loadPicture("Faces\\Flat Map test.png");
   //globe.rotateGlobe(2, -PI/4);
 
 
@@ -58,7 +58,7 @@ void setup() {
   noiseSeed(1);
   noiseDetail(13, 0.5);
   //updateGlobe();
-  convert.convert();
+  convert.convertGlobe2Cube();
   
   getImages();
 }
@@ -265,12 +265,12 @@ void keyReleased() {
     break;
   case 'a':
     sampleRadius -= 0.25;
-    updateGlobe();
+    //updateGlobe();
     println("Sample Radius: "+sampleRadius);
     break;
   case 'd':
     sampleRadius += 0.25;
-    updateGlobe();
+    //updateGlobe();
     println("Sample Radius: "+sampleRadius);
     break;
   }
